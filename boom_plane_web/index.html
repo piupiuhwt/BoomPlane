@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BoomPlane</title>
+    <style>
+        #sPlaneMap{
+            width: 420px;
+            height: 420px;
+            background:black;
+            font-size:0;
+            box-sizing: content-box;
+            position: relative;
+            margin: 10px;
+            display: inline-block;
+            float: left;
+            /*border: 5px solid red;*/
+        }
+        #dPlaneMap{
+            width: 420px;
+            height: 420px;
+            background:black;
+            font-size:0;
+            box-sizing: content-box;
+            position: relative;
+            margin: 10px;
+            display: inline-block;
+            float: left;
+            /*border: 5px solid red;*/
+        }
+        .block-init {
+            width: 30px;
+            height: 30px;
+            background: #555555 no-repeat;
+            background-size: 30px 30px;
+            display: inline-block;
+            box-sizing: border-box;
+            border: 1px solid #777777;
+            z-index: 1000;
+            position: relative;
+        }
+        .block-init2{
+            width: 30px;
+            height: 30px;
+            background: url("image/0.bmp") no-repeat;
+            background-size: 30px 30px;
+            display: inline-block;
+            box-sizing: border-box;
+            border: 1px solid #777777;
+            z-index: 1;
+        }
+        .block-init3{
+            width: 30px;
+            height: 30px;
+            background: url("image/b_box.png") no-repeat;
+            background-size: 30px 30px;
+            display: inline-block;
+            box-sizing: border-box;
+            border: 1px solid #777777;
+            z-index: 1;
+        }
+        .block-init4{
+            width: 30px;
+            height: 30px;
+            background: url("image/r_j.png") no-repeat;
+            background-size: 30px 30px;
+            display: inline-block;
+            box-sizing: border-box;
+            border: 1px solid #777777;
+            z-index: 1;
+        }
+        .block-plane{
+            box-sizing: border-box;
+            z-index: 1000;
+            position: absolute;
+         }
+        .block-plane-n{
+            width:150px;
+            height: 120px;
+            background: url("image/plane-n.png") no-repeat;
+            background-size: 150px 120px;
+        }
+        .block-plane-s{
+            width:150px;
+            height: 120px;
+            background: url("image/plane-s.png") no-repeat;
+            background-size: 150px 120px;
+        }
+        .block-plane-e{
+            width:120px;
+            height: 150px;
+            background: url("image/plane-e.png") no-repeat;
+            background-size: 120px 150px;
+        }
+        .block-plane-w{
+            width:120px;
+            height: 150px;
+            background: url("image/plane-w.png") no-repeat;
+            background-size: 120px 150px;
+        }
+
+    </style>
+</head>
+<script type="text/javascript">
+    var ws = new WebSocket("ws://localhost:8080/plane/single/123");
+    // var ws = new WebSocket("ws://localhost:8080");
+    ws.onopen = (ws,e) => {
+        console.log(e);
+        alert("链接已经开启")
+    }
+    ws.onclose =(ws,e) => {
+        console.log(e);
+        alert("已经断开链接")
+    }
+    ws.onerror = (e)=> {
+        console.log(e);
+    }
+    function send(message) {
+        if (!window.WebSocket) {
+            return;
+        }
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(message));
+        } else {
+            alert("连接没有开启.");
+        }
+    }
+</script>
+<body>
+    <div id="dPlaneMap" style="display: none"></div>
+    <div id="sPlaneMap"></div>
+    <button id="initButton" onclick="ready()">已准备</button>
+    <script type="text/javascript">
+        const unitWidth = 30;
+        const unitHeight = 30;
+        const sFlag = "m";  //我方地图标志字符串
+        const dFlag = "d";  //对方地图标志字符串
+        const pFlag = "p";  //飞机标志字符串
+        //飞机朝向属性
+        const sPlaneMapString = "sPlaneMap";
+        const dPlaneMapString = "dPlaneMap";
+        const planeStyleArray = ["block-plane-e","block-plane-s","block-plane-w","block-plane-n"];
+        var sData = [];
+        var dData = [];
+
+
+        var cMove = [false,false,false];
+        var ctl = [0,0]
+
+        var planes = [];
+        planes[0] = [1,1,3];
+        planes[1] = [5,5,2];
+        planes[2] = [9,3,1];
+
+        //初始化我方飞机图
+        function initsPlaneMap(){
+            let sPlaneMap = document.getElementById(sPlaneMapString);
+            for(let i = 0 ; i<14; i++){
+                let sBlock = [];
+                for(let j = 0; j< 14; j++){
+                    //初始化自记得地图
+                    add(sPlaneMap,sFlag+i + "-"+j);
+                    sBlock[j] = document.getElementById(sFlag + i + "-" + j);
+                }
+                sData[i] = sBlock;
+            }
+            for(let i=0;i<planes.length;i++){
+                addPlane(i,planes[i][0],planes[i][1],planes[i][2]);
+            }
+
+        }
+        //初始化敌方飞机图
+        function initdPlaneMap(){
+            let dPlaneMap = document.getElementById(dPlaneMapString);
+            for(let i = 0 ; i<14; i++){
+                let dBlock = [];
+                for(let j = 0; j< 14; j++){
+                    //初始化对方地图及点击事件
+                    add(dPlaneMap,dFlag+i + "-"+j);
+                    let dElement = document.getElementById(dFlag+i+"-"+j);
+                    dElement.addEventListener('click',(e) => {
+                        //TODO
+
+                        let id = dElement.id;
+                        let flag1 = id.indexOf(dFlag)+dFlag.length;
+                        let flag2 = id.indexOf("-");
+                        console.log(id);
+                        send({
+                            code:5,
+                            x:id.substring(flag2+1),
+                            y:id.substring(flag1, flag2)
+                        })
+                        // dElement.className="block-init2";
+                    })
+                    dBlock[j] = dElement;
+                }
+                dData[i] = dBlock;
+            }
+            ws.onmessage = (event) => {
+                console.log(event)
+                let data = JSON.parse(event.data);
+                let code = data.code;
+                console.log(code);
+                if(code){
+                    switch (code) {
+                        case 0: {
+                            alert(data.message)
+                            break;
+                        }
+                        case 1: break;
+                        case 2: break;
+                        case 3: break;
+                        case 4: {
+                            let id = dFlag + data.y + "-" + data.x;
+                            let bElement = document.getElementById(id);
+                            switch (data.type) {
+                                case 1: {
+                                    bElement.className="block-init2"
+                                    break;
+                                }
+                                case 2: {
+                                    bElement.className="block-init3"
+                                    break;
+                                }
+                                case 3: {
+                                    bElement.className="block-init4"
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            };
+        }
+
+        //为地图添加瓦片
+        function add(planeMap,id) {
+            let div = document.createElement("div");
+            div.className = "block-init";
+            div.id=id;
+            planeMap.append(div);
+        }
+
+        //初始化飞机
+        function addPlane(id,x,y,direction){
+            let planeMap = document.getElementById(sPlaneMapString);
+            let plane = document.createElement("div");
+            plane.className = "block-plane "+planeStyleArray[direction];
+            plane.style.left =  x * unitWidth + "px";
+            plane.style.top = y * unitHeight + "px";
+            plane.id=pFlag+id;
+            plane.setAttribute("pid", id);
+            planeMap.append(plane);
+            plane.addEventListener("mousedown",(e)=>{
+                console.log(e);
+                plane.style.border = "red solid 1px"
+                //记录鼠标此时到div的上边距和左边距离
+                ctl = [Number(e.offsetY)-Number(plane.offsetTop), Number(e.offsetX)-Number(plane.offsetLeft)];
+                cMove[plane.getAttribute("pid")] = true;
+                falseReady();
+                plane.addEventListener("mousemove",(event)=>{
+                    console.log(event)
+                    if(cMove[plane.getAttribute("pid")]){
+                        plane.style.left =  (Number(event.offsetX)-ctl[1])+ "px";
+                        plane.style.top = (Number(event.offsetY)-ctl[0])+ "px";
+                    }
+                })
+            })
+            plane.addEventListener("mouseup",()=>{
+                plane.removeEventListener("mousemove",()=>{})
+                let orginLeft = plane.style.left;
+                let orginTop = plane.style.top;
+                plane.style.border = "";
+                plane.style.left =  orginLeft + "px";
+                plane.style.top = orginTop + "px";
+                cMove[plane.getAttribute("pid")] = false;
+                trueReady();
+            })
+
+        }
+
+        //准备渲染对方地图
+        function ready() {
+            //ws 通知服务器已准备
+            initdPlaneMap();
+            let dPlaneMap = document.getElementById(dPlaneMapString);
+            dPlaneMap.setAttribute("style", "display:block");
+            let initButton = document.getElementById("initButton");
+            initButton.setAttribute("disabled", "disabled");
+            //sPlaneMap 不可变更设置
+            send({
+                code: 4,
+                planes:[
+                    {x:planes[0][0], y:planes[0][1], direction:planes[0][2],},
+                    {x:planes[1][0], y:planes[1][1], direction:planes[1][2],},
+                    {x:planes[2][0], y:planes[2][1], direction:planes[2][2],}
+                ]
+            })
+            send({
+                code: 3,
+            })
+        }
+
+        //设置准备不可点击
+        function falseReady() {
+            let initButton = document.getElementById("initButton");
+            initButton.setAttribute("disabled", "disabled");
+        }
+
+        //设置准备可以点击
+        function trueReady() {
+            let initButton = document.getElementById("initButton");
+            initButton.removeAttribute("disabled");
+        }
+
+        initsPlaneMap();
+
+
+
+    </script>
+</body>
+</html>
