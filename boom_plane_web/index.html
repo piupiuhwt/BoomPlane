@@ -3,103 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>BoomPlane</title>
-    <style>
-        #sPlaneMap{
-            width: 420px;
-            height: 420px;
-            background:black;
-            font-size:0;
-            box-sizing: content-box;
-            position: relative;
-            margin: 10px;
-            display: inline-block;
-            float: left;
-            /*border: 5px solid red;*/
-        }
-        #dPlaneMap{
-            width: 420px;
-            height: 420px;
-            background:black;
-            font-size:0;
-            box-sizing: content-box;
-            position: relative;
-            margin: 10px;
-            display: inline-block;
-            float: left;
-            /*border: 5px solid red;*/
-        }
-        .block-init {
-            width: 30px;
-            height: 30px;
-            background: #555555 no-repeat;
-            background-size: 30px 30px;
-            display: inline-block;
-            box-sizing: border-box;
-            border: 1px solid #777777;
-            z-index: 1000;
-            position: relative;
-        }
-        .block-init2{
-            width: 30px;
-            height: 30px;
-            background: url("image/0.bmp") no-repeat;
-            background-size: 30px 30px;
-            display: inline-block;
-            box-sizing: border-box;
-            border: 1px solid #777777;
-            z-index: 1;
-        }
-        .block-init3{
-            width: 30px;
-            height: 30px;
-            background: url("image/b_box.png") no-repeat;
-            background-size: 30px 30px;
-            display: inline-block;
-            box-sizing: border-box;
-            border: 1px solid #777777;
-            z-index: 1;
-        }
-        .block-init4{
-            width: 30px;
-            height: 30px;
-            background: url("image/r_j.png") no-repeat;
-            background-size: 30px 30px;
-            display: inline-block;
-            box-sizing: border-box;
-            border: 1px solid #777777;
-            z-index: 1;
-        }
-        .block-plane{
-            box-sizing: border-box;
-            z-index: 1000;
-            position: absolute;
-         }
-        .block-plane-n{
-            width:150px;
-            height: 120px;
-            background: url("image/plane-n.png") no-repeat;
-            background-size: 150px 120px;
-        }
-        .block-plane-s{
-            width:150px;
-            height: 120px;
-            background: url("image/plane-s.png") no-repeat;
-            background-size: 150px 120px;
-        }
-        .block-plane-e{
-            width:120px;
-            height: 150px;
-            background: url("image/plane-e.png") no-repeat;
-            background-size: 120px 150px;
-        }
-        .block-plane-w{
-            width:120px;
-            height: 150px;
-            background: url("image/plane-w.png") no-repeat;
-            background-size: 120px 150px;
-        }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="./css/index.css" />
 </head>
 <script type="text/javascript">
     var ws = new WebSocket("ws://localhost:8080/plane/single/123");
@@ -256,25 +160,27 @@
                 console.log(e);
                 plane.style.border = "red solid 1px"
                 //记录鼠标此时到div的上边距和左边距离
-                ctl = [Number(e.offsetY)-Number(plane.offsetTop), Number(e.offsetX)-Number(plane.offsetLeft)];
+                ctl = [Number(e.clientY)-Number(plane.offsetTop), Number(e.clientX)-Number(plane.offsetLeft)];
                 cMove[plane.getAttribute("pid")] = true;
                 falseReady();
                 plane.addEventListener("mousemove",(event)=>{
-                    console.log(event)
                     if(cMove[plane.getAttribute("pid")]){
-                        plane.style.left =  (Number(event.offsetX)-ctl[1])+ "px";
-                        plane.style.top = (Number(event.offsetY)-ctl[0])+ "px";
+                        plane.style.left =  (Number(event.clientX)-ctl[1])+ "px";
+                        plane.style.top = (Number(event.clientY)-ctl[0])+ "px";
                     }
                 })
             })
+            plane.addEventListener("mouseout",()=>{
+                plane.removeEventListener("mousemove",()=>{})
+                cMove[plane.getAttribute("pid")] = false;
+                plane.style.border = "";
+                trueReady();
+            })
+
             plane.addEventListener("mouseup",()=>{
                 plane.removeEventListener("mousemove",()=>{})
-                let orginLeft = plane.style.left;
-                let orginTop = plane.style.top;
-                plane.style.border = "";
-                plane.style.left =  orginLeft + "px";
-                plane.style.top = orginTop + "px";
                 cMove[plane.getAttribute("pid")] = false;
+                plane.style.border = "";
                 trueReady();
             })
 

@@ -1,0 +1,94 @@
+#sPlaneMap{
+    width: 420px;
+    height: 420px;
+    background:black;
+    font-size:0;
+    box-sizing: content-box;
+    position: relative;
+    margin: 10px;
+    display: inline-block;
+    float: left;
+    /*border: 5px solid red;*/
+}
+#dPlaneMap{
+    width: 420px;
+    height: 420px;
+    background:black;
+    font-size:0;
+    box-sizing: content-box;
+    position: relative;
+    margin: 10px;
+    display: inline-block;
+    float: left;
+    /*border: 5px solid red;*/
+}
+.block-init {
+    width: 30px;
+    height: 30px;
+    background: #555555 no-repeat;
+    background-size: 30px 30px;
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid #777777;
+    z-index: 1000;
+    position: relative;
+}
+.block-init2{
+    width: 30px;
+    height: 30px;
+    background: url("../image/0.bmp") no-repeat;
+    background-size: 30px 30px;
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid #777777;
+    z-index: 1;
+}
+.block-init3{
+    width: 30px;
+    height: 30px;
+    background: url("../image/b_box.png") no-repeat;
+    background-size: 30px 30px;
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid #777777;
+    z-index: 1;
+}
+.block-init4{
+    width: 30px;
+    height: 30px;
+    background: url("../image/r_j.png") no-repeat;
+    background-size: 30px 30px;
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid #777777;
+    z-index: 1;
+}
+.block-plane{
+    box-sizing: border-box;
+    z-index: 1000;
+    position: absolute;
+}
+.block-plane-n{
+    width:150px;
+    height: 120px;
+    background: url("../image/plane-n.png") no-repeat;
+    background-size: 150px 120px;
+}
+.block-plane-s{
+    width:150px;
+    height: 120px;
+    background: url("../image/plane-s.png") no-repeat;
+    background-size: 150px 120px;
+}
+.block-plane-e{
+    width:120px;
+    height: 150px;
+    background: url("../image/plane-e.png") no-repeat;
+    background-size: 120px 150px;
+}
+.block-plane-w{
+    width:120px;
+    height: 150px;
+    background: url("../image/plane-w.png") no-repeat;
+    background-size: 120px 150px;
+}
