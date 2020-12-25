@@ -1,3 +1,9 @@
 server:
   port: 9090
 
+
+data-list:
+  - east
+  - west
+  - north
+  - south

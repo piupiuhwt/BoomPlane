@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="./css/index.css" />
 </head>
 <script type="text/javascript">
-    var ws = new WebSocket("ws://localhost:8080/plane/single/123");
+    var ws = new WebSocket("ws://localhost:9090/websocket/123");
     // var ws = new WebSocket("ws://localhost:8080");
     ws.onopen = (ws,e) => {
         console.log(e);
@@ -156,20 +156,22 @@
             plane.id=pFlag+id;
             plane.setAttribute("pid", id);
             planeMap.append(plane);
-            plane.addEventListener("mousedown",(e)=>{
-                console.log(e);
-                plane.style.border = "red solid 1px"
-                //记录鼠标此时到div的上边距和左边距离
-                ctl = [Number(e.clientY)-Number(plane.offsetTop), Number(e.clientX)-Number(plane.offsetLeft)];
-                cMove[plane.getAttribute("pid")] = true;
-                falseReady();
-                plane.addEventListener("mousemove",(event)=>{
-                    if(cMove[plane.getAttribute("pid")]){
-                        plane.style.left =  (Number(event.clientX)-ctl[1])+ "px";
-                        plane.style.top = (Number(event.clientY)-ctl[0])+ "px";
-                    }
-                })
-            })
+            // plane.addEventListener("mousedown",(e)=>{
+            //     console.log(e);
+            //     plane.style.border = "red solid 1px"
+            //     //记录鼠标此时到div的上边距和左边距离
+            //     ctl = [Number(e.clientY)-Number(plane.offsetTop), Number(e.clientX)-Number(plane.offsetLeft)];
+            //     cMove[plane.getAttribute("pid")] = true;
+            //     falseReady();
+            //     plane.addEventListener("mousemove",(event)=>{
+            //         if(cMove[plane.getAttribute("pid")]){
+            //             plane.style.left =  (Number(event.clientX)-ctl[1])+ "px";
+            //             plane.style.top = (Number(event.clientY)-ctl[0])+ "px";
+            //         }
+            //     })
+            // })
+            addPlaneDownEvent(plane,"touchstart","touchmove")
+            addPlaneDownEvent(plane,"mousedown","mousemove")
             plane.addEventListener("mouseout",()=>{
                 plane.removeEventListener("mousemove",()=>{})
                 cMove[plane.getAttribute("pid")] = false;
@@ -184,6 +186,24 @@
                 trueReady();
             })
 
+        }
+
+        function addPlaneDownEvent(plane,down,move){
+            plane.addEventListener(down,(e)=>{
+                console.log(e);
+                plane.style.border = "red solid 1px"
+                //记录鼠标此时到div的上边距和左边距离
+                ctl = [Number(e.clientY)-Number(plane.offsetTop), Number(e.clientX)-Number(plane.offsetLeft)];
+                cMove[plane.getAttribute("pid")] = true;
+                falseReady();
+                plane.addEventListener(move,(event)=>{
+                    console.log(e)
+                    if(cMove[plane.getAttribute("pid")]){
+                        plane.style.left =  (Number(event.clientX)-ctl[1])+ "px";
+                        plane.style.top = (Number(event.clientY)-ctl[0])+ "px";
+                    }
+                })
+            })
         }
 
         //准备渲染对方地图

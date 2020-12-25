@@ -1,17 +1,19 @@
 package com.hwt.websocket;
 
+import com.hwt.entity.Room;
+import com.hwt.websocket.processer.MessageProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.websocket.OnError;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
+import javax.annotation.PostConstruct;
+import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ServerEndpoint("/websocket/{username}")
@@ -20,8 +22,12 @@ public class WebSocket {
     static Logger log = LoggerFactory.getLogger(WebSocket.class);
     private static Map<String, Session> clients = new ConcurrentHashMap<>();
     private static int onlineCount;
-//    private Session session;
-//    private String username;
+    private MessageProcessor processor;
+
+    @PostConstruct
+    void initWebSocketService(){
+
+    }
 
 
     @OnOpen
@@ -40,7 +46,12 @@ public class WebSocket {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    @OnMessage
+    public void onMessage(Session session,String message) throws IOException {
+        System.out.println(message);
+        session.getBasicRemote().sendText(message);
     }
 
 
@@ -68,7 +79,7 @@ public class WebSocket {
     /**
      * 发送自定义消息
      * */
-    public void sendInfo(String message,@PathParam("username") String username) throws IOException {
+    public void sendInfo(String message, String username) throws IOException {
         log.info("发送消息到:"+username+"，报文:"+message);
         if(StringUtils.isNotBlank(username)&&clients.containsKey(username)){
             sendMessage(clients.get(username),message);

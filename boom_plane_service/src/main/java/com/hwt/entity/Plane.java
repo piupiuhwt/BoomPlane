@@ -17,4 +17,9 @@ public class Plane {
 
     private Integer headY;
 
+    public Plane(int x,int y,int direction){
+        this.headX = x;
+        this.headY = y;
+        this.direction = Direction.values()[direction];
+    }
 }
